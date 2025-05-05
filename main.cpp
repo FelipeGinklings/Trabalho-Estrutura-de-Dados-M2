@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 // Porcentagens de distribuição de pessoas
 constexpr double PORCENTAGEM_SOCIO_TORCEDOR = 0.05;  // 5% das pessoas procuram guichês sócio-torcedor
@@ -65,5 +66,16 @@ struct Torcedor {
     Torcedor(const bool tipo, const int unidadesDeTempo) : tipo(tipo), unidadesDeTempo(unidadesDeTempo) {}
 };
 
+int criarTorcedoresIniciais(const int qtdTorc) {
+    int qtdSociosInt = qtdTorc * PORCENTAGEM_SOCIO_TORCEDOR;
+    int qtdTorcNor = qtdTorc * PORCENTAGEM_NORMAL;
+    float qtdSociosFloat = qtdTorc * PORCENTAGEM_SOCIO_TORCEDOR;
+    if (qtdSociosFloat - qtdSociosInt <= 0.5) qtdTorcNor++;
 
-int main() { return 0; }
+    return qtdTorcNor;
+}
+
+int main() {
+    std::cout << criarTorcedoresIniciais(58) << "  " << 58 - criarTorcedoresIniciais(58);
+    return 0;
+}
