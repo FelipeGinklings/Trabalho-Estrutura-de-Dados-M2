@@ -4,6 +4,7 @@
 
 #ifndef FILA_HPP
 #define FILA_HPP
+#include <wchar.h>
 
 template<typename TIPO>
 struct Item {
@@ -54,6 +55,18 @@ TIPO primeiro(Fila<TIPO> &f) {
     if (f.inicio != NULL) {
         return f.inicio.dado;
     }
+}
+
+template<typename TIPO>
+TIPO totalDaFila(Fila<TIPO> f) {
+    TIPO total;
+    auto aux = f.inicio;
+    while (aux != NULL) {
+        total += *aux;
+        aux = aux->prox;
+    }
+
+    return total;
 }
 
 #endif  // FILA_HPP
