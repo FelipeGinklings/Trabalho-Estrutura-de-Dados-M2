@@ -4,17 +4,16 @@
 
 #ifndef FILA_HPP
 #define FILA_HPP
-#include <wchar.h>
 
 template<typename TIPO>
-struct Item {
+struct ItemFila {
     TIPO dado;
-    Item<TIPO> *prox;
+    ItemFila<TIPO> *prox;
 };
 
 template<typename TIPO>
 struct Fila {
-    Item<TIPO> *inicio;
+    ItemFila<TIPO> *inicio;
 };
 
 template<typename TIPO>
@@ -24,24 +23,24 @@ void inicializaFila(Fila<TIPO> &f) {
 
 template<typename TIPO>
 void entrarNaFila(Fila<TIPO> &f, TIPO dado) {
-    auto novoItem = new Item<TIPO>;
+    auto novoItem = new ItemFila<TIPO>;
     novoItem->dado = dado;
-    novoItem->prox = NULL;
-    if (f.inicio == NULL) {
+    novoItem->prox = nullptr;
+    if (f.inicio == nullptr) {
         f.inicio = novoItem;
     } else {
-        Item<TIPO> *aux = f.inicio;
-        while (aux->prox != NULL) {
-            aux = aux->prox;
+        ItemFila<TIPO> *aux = f.inicio;
+        while (aux->prox != nullptr) {
         }
         aux->prox = novoItem;
     }
 }
 
+
 template<typename TIPO>
 TIPO atender(Fila<TIPO> &f) {
-    if (f.inicio != NULL) {
-        Item<TIPO> *apagado = f.inicio;
+    if (f.inicio != nullptr) {
+        ItemFila<TIPO> *apagado = f.inicio;
         TIPO dado = apagado->dado;
         f.inicio = apagado->prox;
 
@@ -55,18 +54,6 @@ TIPO primeiro(Fila<TIPO> &f) {
     if (f.inicio != NULL) {
         return f.inicio.dado;
     }
-}
-
-template<typename TIPO>
-TIPO totalDaFila(Fila<TIPO> f) {
-    TIPO total;
-    auto aux = f.inicio;
-    while (aux != NULL) {
-        total += *aux;
-        aux = aux->prox;
-    }
-
-    return total;
 }
 
 #endif  // FILA_HPP

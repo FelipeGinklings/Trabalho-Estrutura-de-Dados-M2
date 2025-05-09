@@ -1,6 +1,7 @@
-#include <cmath>
 #include <iostream>
-#include <vector>
+
+#include "fila.hpp"
+#include "set.hpp"
 
 // Porcentagens de distribuição de pessoas
 constexpr int PORCENTAGEM_SOCIO_TORCEDOR = 5;  // 5% das pessoas procuram guichês sócio-torcedor
@@ -18,8 +19,8 @@ constexpr int PORCENTAGEM_NORMAL_TEMPO_3 = 25;  // 25% são atendidas em 1 unida
 struct DadosDeEntrada {
     int qtdDeGuiSocTorc, qtdDeGuiNorm, cargaInicial, qtdPorTemp, tempoSimulado;
 
-    DadosDeEntrada(const int qtdDeGuiSocTorc, const int qtdDeGuiNorm, const int cargaInicial, const int qtdPorTemp,
-                   const int tempoSimulado) :
+    DadosDeEntrada(const int qtdDeGuiSocTorc, const int qtdDeGuiNorm, const int cargaInicial,
+                   const int qtdPorTemp, const int tempoSimulado) :
         qtdDeGuiSocTorc(qtdDeGuiSocTorc), qtdDeGuiNorm(qtdDeGuiNorm), cargaInicial(cargaInicial),
         qtdPorTemp(qtdPorTemp), tempoSimulado(tempoSimulado) {}
 };
@@ -46,37 +47,25 @@ DadosDeEntrada pedirDadosDeEntrada() {
 }
 
 struct QuantidadeTorcedores {
-    int socioTorcedor;
-    int normal;
+    int socioTorcedor, normal, socioTempo1, socioTempo2, normalTempo1, normalTempo2, normalTempo3;
 
-    QuantidadeTorcedores(const int socioTorcedor, const int normal) : socioTorcedor(socioTorcedor), normal(normal) {}
-};
-struct QuantidadeSocioTempo {
-    int socioTempo1;
-    int socioTempo2;
-
-    QuantidadeSocioTempo(const int socioTempo1, const int socioTempo2) :
-        socioTempo1(socioTempo1), socioTempo2(socioTempo2) {}
-};
-struct QuantidadeNormalTempo {
-    int normalTempo1;
-    int normalTempo2;
-    int normalTempo3;
-
-    QuantidadeNormalTempo(const int normalTempo1, const int normalTempo2, const int normalTempo3) :
-        normalTempo1(normalTempo1), normalTempo2(normalTempo2), normalTempo3(normalTempo3) {}
+    QuantidadeTorcedores(const int socioTorcedor, const int normal, const int socioTempo1,
+                         const int socioTempo2, const int normalTempo1, const int normalTempo2,
+                         const int normalTempo3) :
+        socioTorcedor(socioTorcedor), normal(normal), socioTempo1(socioTempo1),
+        socioTempo2(socioTempo2), normalTempo1(normalTempo1), normalTempo2(normalTempo2),
+        normalTempo3(normalTempo3) {}
 };
 
-struct Torcedor {
-    bool tipo;  // Verdade para sócio e falso para normal
-    int unidadesDeTempo;
-    Torcedor(const bool tipo, const int unidadesDeTempo) : tipo(tipo), unidadesDeTempo(unidadesDeTempo) {}
-    Torcedor() : tipo(false), unidadesDeTempo(0) {}
-};
-
-Torcedor operator+(const Torcedor& torcedor1, const Torcedor& torcedor2) {
-    Torcedor resultado(false, 0);
-    resultado.unidadesDeTempo = torcedor1.unidadesDeTempo + torcedor2.unidadesDeTempo;
+QuantidadeTorcedores operator-(const QuantidadeTorcedores& qtd1, const QuantidadeTorcedores& qtd2) {
+    QuantidadeTorcedores resultado(0, 0, 0, 0, 0, 0, 0);
+    resultado.socioTorcedor = qtd1.socioTorcedor - qtd2.socioTorcedor;
+    resultado.normal = qtd1.normal - qtd2.normal;
+    resultado.socioTempo1 = qtd1.socioTempo1 - qtd2.socioTempo1;
+    resultado.socioTempo2 = qtd1.socioTempo2 - qtd2.socioTempo2;
+    resultado.normalTempo1 = qtd1.normalTempo1 - qtd2.normalTempo1;
+    resultado.normalTempo2 = qtd1.normalTempo2 - qtd2.normalTempo2;
+    resultado.normalTempo3 = qtd1.normalTempo3 - qtd2.normalTempo3;
     return resultado;
 }
 
@@ -114,8 +103,106 @@ int quantidadePorPorcentagem(const int quantidade, const int porcentagem) {
     if (quantidade == 2 && (porcentagem == 95 || porcentagem == 5)) return 1;
     if (quantidade == 3 && porcentagem >= 25 && porcentagem <= 45) return 1;
     if (quantidade % 20 == 0 || porcentagem == 25 || porcentagem >= 85) return porcentagemInicial;
-    if (porcentagem == 30) return quantidade - quantidade * 25 / 100 - (quantidade * 45 + 100) / 100;
+    if (porcentagem == 30)
+        return quantidade - quantidade * 25 / 100 - (quantidade * 45 + 100) / 100;
     return porcentagemInicial + 1;
 }
 
-int main() { return 0; }
+void adicionarQuantidadeTorcedores(QuantidadeTorcedores& qtdTorcedores, const int quantidade) {
+    qtdTorcedores.socioTorcedor += quantidadePorPorcentagem(quantidade, PORCENTAGEM_SOCIO_TORCEDOR);
+    qtdTorcedores.normal += quantidadePorPorcentagem(quantidade, PORCENTAGEM_NORMAL);
+    qtdTorcedores.socioTempo1 +=
+            quantidadePorPorcentagem(qtdTorcedores.socioTorcedor, PORCENTAGEM_SOCIO_TEMPO_1);
+    qtdTorcedores.socioTempo2 +=
+            quantidadePorPorcentagem(qtdTorcedores.socioTorcedor, PORCENTAGEM_SOCIO_TEMPO_2);
+    qtdTorcedores.normalTempo1 +=
+            quantidadePorPorcentagem(qtdTorcedores.normal, PORCENTAGEM_NORMAL_TEMPO_1);
+    qtdTorcedores.normalTempo2 +=
+            quantidadePorPorcentagem(qtdTorcedores.normal, PORCENTAGEM_NORMAL_TEMPO_2);
+    qtdTorcedores.normalTempo3 +=
+            quantidadePorPorcentagem(qtdTorcedores.normal, PORCENTAGEM_NORMAL_TEMPO_3);
+}
+
+struct Torcedor {
+    bool tipo;  // Verdade para sócio e falso para normal
+    int unidadesDeTempo;
+    Torcedor(const bool tipo, const int unidadesDeTempo) :
+        tipo(tipo), unidadesDeTempo(unidadesDeTempo) {}
+    Torcedor() : tipo(false), unidadesDeTempo(0) {}
+};
+
+Torcedor operator+(const Torcedor& torcedor1, const Torcedor& torcedor2) {
+    Torcedor resultado(false, 0);
+    resultado.unidadesDeTempo = torcedor1.unidadesDeTempo + torcedor2.unidadesDeTempo;
+    return resultado;
+}
+
+struct Guiche {
+    Fila<Torcedor> fila;
+    int tempoEspera;
+
+    Guiche() : fila(), tempoEspera(0) {}
+    Guiche(const Fila<Torcedor>& fila) : fila(fila), tempoEspera() {}
+    Guiche(const Fila<Torcedor>& fila, const int& tempoEspera) :
+        fila(fila), tempoEspera(tempoEspera) {}
+};
+
+Guiche* operator+(const Guiche*& guiche1, const Guiche*& guiche2) {
+    const auto resultado = new Guiche();
+    resultado->tempoEspera = guiche1->tempoEspera + guiche2->tempoEspera;
+    return resultado;
+}
+
+bool operator>(const Guiche& guiche1, const Guiche& guiche2) {
+    return guiche1.tempoEspera > guiche2.tempoEspera;
+}
+
+SetEncadeado<Guiche> criarGuichesIniciais(const DadosDeEntrada& dadosDeEntrada, const bool tipo) {
+    const auto [qtdDeGuiSocTorc, qtdDeGuiNorm, _0, _1, _2] = dadosDeEntrada;
+
+    QuantidadeTorcedores qtdTorcedores(0, 0, 0, 0, 0, 0, 0);
+    adicionarQuantidadeTorcedores(qtdTorcedores, dadosDeEntrada.cargaInicial);
+
+    const auto [socioTorcedor, normal, socioTempo1, socioTempo2, normalTempo1, normalTempo2,
+                normalTempo3] = qtdTorcedores;
+
+
+    SetEncadeado<Guiche> guichesIniciais;
+    inicializarSet(guichesIniciais);
+    for (int i = 0; i < (tipo ? qtdDeGuiSocTorc : 0) + qtdDeGuiNorm; i++) {
+        Fila<Torcedor> fila;
+        inicializaFila(fila);
+        adicionarNoSet(guichesIniciais, Guiche(fila));
+    }
+
+    int tempo1 = tipo ? socioTempo1 : normalTempo1;
+    int tempo2 = tipo ? socioTempo2 : normalTempo2;
+    int tempo3 = tipo ? 0 : normalTempo3;
+
+    int time = 1;
+
+    for (int i = 0; i < (tipo ? socioTorcedor : normal); i++) {
+        Guiche guiche = guichesIniciais.inicio->dado;
+        entrarNaFila(guiche.fila, Torcedor(true, time));
+        atualizarSet(guichesIniciais, guiche);
+        guiche.tempoEspera += time;
+        if (tempo1 > 0 && time == 1) {
+            tempo1--;
+            time = 2;
+        } else if (tempo2 > 0 && time == 2) {
+            tempo2--;
+            time = tipo ? 1 : 3;
+        } else if (tempo3 > 0 && time == 3) {
+            tempo3--;
+            time = 1;
+        }
+    }
+    return guichesIniciais;
+}
+
+int main() {
+    SetEncadeado<Guiche> guichesSocio =
+            criarGuichesIniciais(DadosDeEntrada(4, 4, 20, 20, 30), false);
+
+    return 0;
+}
