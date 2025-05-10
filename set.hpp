@@ -41,43 +41,50 @@ bool adicionarNoSet(SetEncadeado<Tipo> &setEncadeado, Tipo item) {
 }
 
 template<typename Tipo>
-bool atualizarSet(SetEncadeado<Tipo> &setEncadeado, Tipo novoDado) {
-    if (setEncadeado.inicio == NULL || setEncadeado.inicio == setEncadeado.fim) {
-        return false;
-    }
-
-    if (setEncadeado.fim->proximo != setEncadeado.inicio ||
+bool atualizarSet(SetEncadeado<Tipo> &setEncadeado) {
+    if (setEncadeado.inicio == NULL || setEncadeado.fim == NULL ||
+        setEncadeado.fim->proximo != setEncadeado.inicio ||
         setEncadeado.inicio->anterior != setEncadeado.fim) {
         return false;
     }
 
+    const Tipo dadoAntigoInicio = setEncadeado.inicio->dado;
+    const Tipo dadoInicioProximo = setEncadeado.inicio->proximo->dado;
+
+    if (dadoInicioProximo >= dadoAntigoInicio) return true;
+
     Item<Tipo> *antigoInicio = setEncadeado.inicio;
-    antigoInicio->dado = antigoInicio->dado + novoDado;
+    antigoInicio->dado = dadoAntigoInicio;
+
     setEncadeado.inicio = antigoInicio->proximo;
     setEncadeado.inicio->anterior = setEncadeado.fim;
     setEncadeado.fim->proximo = setEncadeado.inicio;
 
-    Item<Tipo> *aux = setEncadeado.inicio;
-    Item<Tipo> *previous = NULL;
+    const Tipo dadoFim = setEncadeado.fim->dado;
 
-    while (aux != setEncadeado.inicio->anterior && antigoInicio->dado > aux->dado) {
-        previous = aux;
-        aux = aux->proximo;
-    }
-
-    if (antigoInicio->dado > aux->dado) {
-        previous = aux;
-        aux = aux->proximo;
-    }
-
-    antigoInicio->proximo = aux;
-    antigoInicio->anterior = previous;
-    previous->proximo = antigoInicio;
-    aux->anterior = antigoInicio;
-
-    if (aux == setEncadeado.inicio) {
+    if (dadoAntigoInicio >= dadoFim) {
+        setEncadeado.inicio->anterior = antigoInicio;
+        setEncadeado.fim->proximo = antigoInicio;
+        antigoInicio->proximo = setEncadeado.inicio;
         setEncadeado.fim = antigoInicio;
+        return true;
     }
+
+    Item<Tipo> *auxiliar = setEncadeado.fim;
+    Tipo dadoAuxiliar = auxiliar->dado;
+
+    while (dadoAuxiliar > dadoAntigoInicio) {
+        auxiliar = auxiliar->anterior;
+        dadoAuxiliar = auxiliar->dado;
+    }
+
+    Item<Tipo> *proximoDoAuxiliar = auxiliar->proximo;
+
+    antigoInicio->proximo = auxiliar->proximo;
+    antigoInicio->anterior = auxiliar;
+    auxiliar->proximo = antigoInicio;
+    proximoDoAuxiliar->anterior = antigoInicio;
+
 
     return true;
 }

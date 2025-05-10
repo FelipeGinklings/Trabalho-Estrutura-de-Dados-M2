@@ -31,6 +31,7 @@ void entrarNaFila(Fila<TIPO> &f, TIPO dado) {
     } else {
         ItemFila<TIPO> *aux = f.inicio;
         while (aux->prox != nullptr) {
+            aux = aux->prox;
         }
         aux->prox = novoItem;
     }

@@ -47,25 +47,20 @@ DadosDeEntrada pedirDadosDeEntrada() {
 }
 
 struct QuantidadeTorcedores {
-    int socioTorcedor, normal, socioTempo1, socioTempo2, normalTempo1, normalTempo2, normalTempo3;
+    int socioTempo1, socioTempo2, normalTempo1, normalTempo2, normalTempo3;
 
-    QuantidadeTorcedores(const int socioTorcedor, const int normal, const int socioTempo1,
-                         const int socioTempo2, const int normalTempo1, const int normalTempo2,
-                         const int normalTempo3) :
-        socioTorcedor(socioTorcedor), normal(normal), socioTempo1(socioTempo1),
-        socioTempo2(socioTempo2), normalTempo1(normalTempo1), normalTempo2(normalTempo2),
-        normalTempo3(normalTempo3) {}
+    QuantidadeTorcedores(const int socioTempo1, const int socioTempo2, const int normalTempo1,
+                         const int normalTempo2, const int normalTempo3) :
+        socioTempo1(socioTempo1), socioTempo2(socioTempo2), normalTempo1(normalTempo1),
+        normalTempo2(normalTempo2), normalTempo3(normalTempo3) {}
 };
-
 QuantidadeTorcedores operator-(const QuantidadeTorcedores& qtd1, const QuantidadeTorcedores& qtd2) {
-    QuantidadeTorcedores resultado(0, 0, 0, 0, 0, 0, 0);
-    resultado.socioTorcedor = qtd1.socioTorcedor - qtd2.socioTorcedor;
-    resultado.normal = qtd1.normal - qtd2.normal;
-    resultado.socioTempo1 = qtd1.socioTempo1 - qtd2.socioTempo1;
-    resultado.socioTempo2 = qtd1.socioTempo2 - qtd2.socioTempo2;
-    resultado.normalTempo1 = qtd1.normalTempo1 - qtd2.normalTempo1;
-    resultado.normalTempo2 = qtd1.normalTempo2 - qtd2.normalTempo2;
-    resultado.normalTempo3 = qtd1.normalTempo3 - qtd2.normalTempo3;
+    QuantidadeTorcedores resultado = qtd1;
+    resultado.socioTempo1 -= qtd2.socioTempo1;
+    resultado.socioTempo2 -= qtd2.socioTempo2;
+    resultado.normalTempo1 -= qtd2.normalTempo1;
+    resultado.normalTempo2 -= qtd2.normalTempo2;
+    resultado.normalTempo3 -= qtd2.normalTempo3;
     return resultado;
 }
 
@@ -88,13 +83,14 @@ QuantidadeTorcedores operator-(const QuantidadeTorcedores& qtd1, const Quantidad
  * - Se quantidade for 3 e porcentagem estiver entre 25% e 45%, retorna 1
  * - Para múltiplos de 20, 25%, ou ≥85%, usa cálculo exato de porcentagem
  * - Caso especial de 30% diminui do total 45% mais 1 e 25% para pegar o valor
- * mais próximo de 25%
+ * mais próximo de 30%
  * - Caso padrão adiciona 1 ao cálculo inicial de porcentagem
  *
  * @warning A função assume que porcentagem está no intervalo 0-100. Valores
  * fora desta faixa podem produzir resultados inesperados.
+ *
  * @warning Esses cálculos são considerando que as porcentagens são 5 ou 15 ou
- * 25 ou 30 ou 45 ou 85 ou 95
+ * 25 ou 30 ou 45 ou 85 ou 95 porcento
  */
 int quantidadePorPorcentagem(const int quantidade, const int porcentagem) {
     const int porcentagemInicial = quantidade * porcentagem / 100;
@@ -109,18 +105,13 @@ int quantidadePorPorcentagem(const int quantidade, const int porcentagem) {
 }
 
 void adicionarQuantidadeTorcedores(QuantidadeTorcedores& qtdTorcedores, const int quantidade) {
-    qtdTorcedores.socioTorcedor += quantidadePorPorcentagem(quantidade, PORCENTAGEM_SOCIO_TORCEDOR);
-    qtdTorcedores.normal += quantidadePorPorcentagem(quantidade, PORCENTAGEM_NORMAL);
-    qtdTorcedores.socioTempo1 +=
-            quantidadePorPorcentagem(qtdTorcedores.socioTorcedor, PORCENTAGEM_SOCIO_TEMPO_1);
-    qtdTorcedores.socioTempo2 +=
-            quantidadePorPorcentagem(qtdTorcedores.socioTorcedor, PORCENTAGEM_SOCIO_TEMPO_2);
-    qtdTorcedores.normalTempo1 +=
-            quantidadePorPorcentagem(qtdTorcedores.normal, PORCENTAGEM_NORMAL_TEMPO_1);
-    qtdTorcedores.normalTempo2 +=
-            quantidadePorPorcentagem(qtdTorcedores.normal, PORCENTAGEM_NORMAL_TEMPO_2);
-    qtdTorcedores.normalTempo3 +=
-            quantidadePorPorcentagem(qtdTorcedores.normal, PORCENTAGEM_NORMAL_TEMPO_3);
+    const int socioTorcedor = quantidadePorPorcentagem(quantidade, PORCENTAGEM_SOCIO_TORCEDOR);
+    const int normal = quantidadePorPorcentagem(quantidade, PORCENTAGEM_NORMAL);
+    qtdTorcedores.socioTempo1 += quantidadePorPorcentagem(socioTorcedor, PORCENTAGEM_SOCIO_TEMPO_1);
+    qtdTorcedores.socioTempo2 += quantidadePorPorcentagem(socioTorcedor, PORCENTAGEM_SOCIO_TEMPO_2);
+    qtdTorcedores.normalTempo1 += quantidadePorPorcentagem(normal, PORCENTAGEM_NORMAL_TEMPO_1);
+    qtdTorcedores.normalTempo2 += quantidadePorPorcentagem(normal, PORCENTAGEM_NORMAL_TEMPO_2);
+    qtdTorcedores.normalTempo3 += quantidadePorPorcentagem(normal, PORCENTAGEM_NORMAL_TEMPO_3);
 }
 
 struct Torcedor {
@@ -140,69 +131,249 @@ Torcedor operator+(const Torcedor& torcedor1, const Torcedor& torcedor2) {
 struct Guiche {
     Fila<Torcedor> fila;
     int tempoEspera;
+    int sendoAtendido;
 
-    Guiche() : fila(), tempoEspera(0) {}
-    Guiche(const Fila<Torcedor>& fila) : fila(fila), tempoEspera() {}
-    Guiche(const Fila<Torcedor>& fila, const int& tempoEspera) :
-        fila(fila), tempoEspera(tempoEspera) {}
+    Guiche() : fila(), tempoEspera(), sendoAtendido() {}
+    Guiche(const Fila<Torcedor> fila, const int tempoEspera) :
+        fila(fila), tempoEspera(tempoEspera), sendoAtendido(0) {}
 };
-
-Guiche* operator+(const Guiche*& guiche1, const Guiche*& guiche2) {
-    const auto resultado = new Guiche();
-    resultado->tempoEspera = guiche1->tempoEspera + guiche2->tempoEspera;
+Guiche operator+(const Guiche& guiche1, const Guiche& guiche2) {
+    Guiche resultado = guiche1;
+    resultado.tempoEspera += guiche2.tempoEspera;
     return resultado;
 }
-
+bool operator>=(const Guiche& guiche1, const Guiche& guiche2) {
+    return guiche1.tempoEspera >= guiche2.tempoEspera;
+}
 bool operator>(const Guiche& guiche1, const Guiche& guiche2) {
     return guiche1.tempoEspera > guiche2.tempoEspera;
 }
 
-SetEncadeado<Guiche> criarGuichesIniciais(const DadosDeEntrada& dadosDeEntrada, const bool tipo) {
-    const auto [qtdDeGuiSocTorc, qtdDeGuiNorm, _0, _1, _2] = dadosDeEntrada;
+void distribuirNosGuiches(SetEncadeado<Guiche>& guichesNormais, SetEncadeado<Guiche>& guichesSocios,
+                          QuantidadeTorcedores qtdTorcedores) {
+    auto& [socioTempo1, socioTempo2, normalTempo1, normalTempo2, normalTempo3] = qtdTorcedores;
+    while (normalTempo1) {
+        if (normalTempo1 > 0) {
+            auto& fila = guichesNormais.inicio->dado.fila;
+            const auto novoTorcedor = Torcedor(false, 3);
+            guichesNormais.inicio->dado.tempoEspera += 3;
+            normalTempo1--;
 
-    QuantidadeTorcedores qtdTorcedores(0, 0, 0, 0, 0, 0, 0);
-    adicionarQuantidadeTorcedores(qtdTorcedores, dadosDeEntrada.cargaInicial);
+            entrarNaFila(fila, novoTorcedor);
+            atualizarSet(guichesNormais);
+        }
+        if (normalTempo2 > 0) {
+            auto& fila = guichesNormais.inicio->dado.fila;
+            const auto novoTorcedor = Torcedor(false, 2);
+            guichesNormais.inicio->dado.tempoEspera += 2;
+            normalTempo2--;
 
-    const auto [socioTorcedor, normal, socioTempo1, socioTempo2, normalTempo1, normalTempo2,
-                normalTempo3] = qtdTorcedores;
+            entrarNaFila(fila, novoTorcedor);
+            atualizarSet(guichesNormais);
+        }
+        if (normalTempo3 > 0) {
+            auto& fila = guichesNormais.inicio->dado.fila;
+            const auto novoTorcedor = Torcedor(false, 1);
+            guichesNormais.inicio->dado.tempoEspera += 1;
+            normalTempo3--;
 
+            entrarNaFila(fila, novoTorcedor);
+            atualizarSet(guichesNormais);
+        }
 
-    SetEncadeado<Guiche> guichesIniciais;
-    inicializarSet(guichesIniciais);
-    for (int i = 0; i < (tipo ? qtdDeGuiSocTorc : 0) + qtdDeGuiNorm; i++) {
-        Fila<Torcedor> fila;
-        inicializaFila(fila);
-        adicionarNoSet(guichesIniciais, Guiche(fila));
-    }
+        const auto tempoEsperaNormal = guichesNormais.inicio->dado.tempoEspera;
+        const auto tempoEsperaSocio = guichesSocios.inicio->dado.tempoEspera;
 
-    int tempo1 = tipo ? socioTempo1 : normalTempo1;
-    int tempo2 = tipo ? socioTempo2 : normalTempo2;
-    int tempo3 = tipo ? 0 : normalTempo3;
+        if (tempoEsperaNormal < tempoEsperaSocio) {
+            if (socioTempo1 > 0) {
+                auto& fila = guichesNormais.inicio->dado.fila;
+                const auto novoTorcedor = Torcedor(false, 1);
+                guichesNormais.inicio->dado.tempoEspera += 1;
+                normalTempo3--;
 
-    int time = 1;
+                entrarNaFila(fila, novoTorcedor);
+                atualizarSet(guichesNormais);
+            }
+            if (socioTempo2 > 0) {
+                auto& fila = guichesNormais.inicio->dado.fila;
+                const auto novoTorcedor = Torcedor(false, 2);
+                guichesNormais.inicio->dado.tempoEspera += 2;
+                normalTempo3--;
 
-    for (int i = 0; i < (tipo ? socioTorcedor : normal); i++) {
-        Guiche guiche = guichesIniciais.inicio->dado;
-        entrarNaFila(guiche.fila, Torcedor(true, time));
-        atualizarSet(guichesIniciais, guiche);
-        guiche.tempoEspera += time;
-        if (tempo1 > 0 && time == 1) {
-            tempo1--;
-            time = 2;
-        } else if (tempo2 > 0 && time == 2) {
-            tempo2--;
-            time = tipo ? 1 : 3;
-        } else if (tempo3 > 0 && time == 3) {
-            tempo3--;
-            time = 1;
+                entrarNaFila(fila, novoTorcedor);
+                atualizarSet(guichesNormais);
+            }
+        } else {
+            if (socioTempo1 > 0) {
+                auto& fila = guichesSocios.inicio->dado.fila;
+                const auto novoTorcedor = Torcedor(true, 1);
+                guichesSocios.inicio->dado.tempoEspera += 1;
+                socioTempo1--;
+
+                entrarNaFila(fila, novoTorcedor);
+                atualizarSet(guichesSocios);
+            }
+            if (socioTempo2 > 0) {
+                auto& fila = guichesSocios.inicio->dado.fila;
+                const auto novoTorcedor = Torcedor(true, 2);
+                guichesSocios.inicio->dado.tempoEspera += 2;
+                socioTempo2--;
+
+                entrarNaFila(fila, novoTorcedor);
+                atualizarSet(guichesSocios);
+            }
         }
     }
-    return guichesIniciais;
+}
+
+QuantidadeTorcedores criarGuichesIniciais(const DadosDeEntrada& dadosDeEntrada,
+                                          SetEncadeado<Guiche>& guichesNormais,
+                                          SetEncadeado<Guiche>& guichesSocios) {
+    int guichesNormal = dadosDeEntrada.qtdDeGuiNorm;
+    while (guichesNormal) {
+        guichesNormal--;
+        Fila<Torcedor> filaNormal{};
+        inicializaFila(filaNormal);
+        const auto guicheNormal = Guiche(filaNormal, 0);
+        adicionarNoSet(guichesNormais, guicheNormal);
+    }
+    int guichesSocio = dadosDeEntrada.qtdDeGuiSocTorc;
+    while (guichesSocio) {
+        guichesSocio--;
+        Fila<Torcedor> filaSocio{};
+        inicializaFila(filaSocio);
+        const auto guicheSocio = Guiche(filaSocio, 0);
+        adicionarNoSet(guichesSocios, guicheSocio);
+    }
+    QuantidadeTorcedores torcedoresIniciais = {0, 0, 0, 0, 0};
+    adicionarQuantidadeTorcedores(torcedoresIniciais, dadosDeEntrada.cargaInicial);
+    return torcedoresIniciais;
+}
+
+QuantidadeTorcedores novosTorcedores(const DadosDeEntrada& dadosDeEntrada,
+                                     const QuantidadeTorcedores& qtdTorcedores, const int turno) {
+    QuantidadeTorcedores novoTorcedores = {0, 0, 0, 0, 0};
+    const int quantidadeAtualTorcedores =
+            dadosDeEntrada.cargaInicial + dadosDeEntrada.qtdPorTemp * turno;
+    adicionarQuantidadeTorcedores(novoTorcedores, quantidadeAtualTorcedores);
+    novoTorcedores = novoTorcedores - qtdTorcedores;
+    return novoTorcedores;
+}
+
+void colocarParaSerAtendido(SetEncadeado<Guiche>& guichesNormais,
+                            SetEncadeado<Guiche>& guichesSocios) {
+    auto atual = guichesNormais.inicio;
+    if (guichesNormais.fim->dado.tempoEspera) {
+        do {  // Coloca em atendimento
+            auto& fila = atual->dado.fila;
+            if (!atual->dado.sendoAtendido && fila.inicio != NULL) {
+                const Torcedor torcedor = atender(fila);
+                atual->dado.sendoAtendido = torcedor.unidadesDeTempo;
+                atual->dado.tempoEspera -= torcedor.unidadesDeTempo;
+                atualizarSet(guichesNormais);
+            }
+            atual = atual->proximo;
+        } while (atual != guichesNormais.inicio);
+    }
+    atual = guichesSocios.inicio;
+    if (guichesSocios.fim->dado.tempoEspera) {
+        do {  // Coloca em atendimento
+            auto& fila = atual->dado.fila;
+            if (!atual->dado.sendoAtendido && fila.inicio != NULL) {
+                const Torcedor torcedor = atender(fila);
+                atual->dado.sendoAtendido = torcedor.unidadesDeTempo;
+                atual->dado.tempoEspera -= torcedor.unidadesDeTempo;
+                atualizarSet(guichesSocios);
+            }
+            atual = atual->proximo;
+        } while (atual != guichesSocios.inicio);
+    }
+}
+
+void umTurnoAtendimento(const SetEncadeado<Guiche>& guichesNormais,
+                        const SetEncadeado<Guiche>& guichesSocios) {
+    auto atual = guichesNormais.inicio;
+    do {  // Coloca em atendimento
+        if (atual->dado.sendoAtendido) atual->dado.sendoAtendido--;
+        atual = atual->proximo;
+    } while (atual != guichesNormais.inicio);
+    atual = guichesSocios.inicio;
+    do {  // Coloca em atendimento
+        if (atual->dado.sendoAtendido) atual->dado.sendoAtendido--;
+        atual = atual->proximo;
+    } while (atual != guichesSocios.inicio);
+}
+
+void print(const SetEncadeado<Guiche> guiches, const bool tipo) {
+    auto atual = guiches.inicio;
+    do {
+        for (int i = 0; i < 4; i++) {
+            auto torcedorAtual = atual->dado.fila.inicio;
+            if (i == 0 || i == 2)
+                std::cout << "|               ";
+            else if (i == 1)
+                std::cout << (tipo ? "| Guiche Socio  " : "| Guiche Normal ");
+            int posicao = 0;
+            while (torcedorAtual != NULL) {
+                posicao++;
+                if (i == 0)
+                    std::cout << "|       " << posicao << "       ";
+                else if (i == 1)
+                    std::cout << "|  Socio: " << (torcedorAtual->dado.tipo ? "Sim" : "Nao")
+                              << "   ";
+                else if (i == 2)
+                    std::cout << "|  Tempo: " << torcedorAtual->dado.unidadesDeTempo << "     ";
+                else if (i == 3)
+                    if (torcedorAtual->prox == NULL)
+                        std::cout << "|_______________|_______________|";
+                    else
+                        std::cout << "|_______________";
+
+                torcedorAtual = torcedorAtual->prox;
+            }
+            std::cout << std::endl;
+        }
+        atual = atual->proximo;
+    } while (guiches.inicio != atual);
 }
 
 int main() {
-    SetEncadeado<Guiche> guichesSocio =
-            criarGuichesIniciais(DadosDeEntrada(4, 4, 20, 20, 30), false);
+    // const auto dadosDeEntrada = pedirDadosDeEntrada();
+    const auto dadosDeEntrada = DadosDeEntrada(1, 4, 20, 0, 12);
+    SetEncadeado<Guiche> guichesNormais{};
+    SetEncadeado<Guiche> guichesSocios{};
+
+    inicializarSet(guichesNormais);
+    inicializarSet(guichesSocios);
+
+    criarGuichesIniciais(dadosDeEntrada, guichesNormais, guichesSocios);
+
+    QuantidadeTorcedores quantidadeDeTorcedoresIniciais = {0, 0, 0, 0, 0};
+    adicionarQuantidadeTorcedores(quantidadeDeTorcedoresIniciais, dadosDeEntrada.cargaInicial);
+
+    distribuirNosGuiches(guichesNormais, guichesSocios, quantidadeDeTorcedoresIniciais);
+
+    int turnos = dadosDeEntrada.tempoSimulado;
+    while (turnos) {
+        turnos--;
+        std::cout << std::string(150, '\n');
+        print(guichesSocios, true);
+        print(guichesNormais, false);
+        std::cout << "Pressione Enter para continuar..." << std::endl;
+        std::string teste;
+        std::cin >> teste;
+        colocarParaSerAtendido(guichesNormais, guichesSocios);
+        umTurnoAtendimento(guichesNormais, guichesSocios);
+        if (!guichesNormais.fim->dado.tempoEspera && !guichesSocios.fim->dado.tempoEspera &&
+            !guichesNormais.fim->dado.sendoAtendido && !guichesSocios.fim->dado.sendoAtendido)
+            turnos = 0;
+        else {
+            const auto quantidadeNovaDeTorcedores =
+                    novosTorcedores(dadosDeEntrada, quantidadeDeTorcedoresIniciais,
+                                    dadosDeEntrada.tempoSimulado - turnos);
+            distribuirNosGuiches(guichesNormais, guichesSocios, quantidadeNovaDeTorcedores);
+        }
+    }
 
     return 0;
 }
