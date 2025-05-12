@@ -1,0 +1,56 @@
+#ifndef FILA_H
+#define FILA_H
+
+template<typename TIPO>
+struct ItemFila {
+    TIPO dado;
+    ItemFila<TIPO> *prox;
+};
+
+template<typename TIPO>
+struct Fila {
+    ItemFila<TIPO> *inicio;
+};
+
+template<typename TIPO>
+void inicializaFila(Fila<TIPO> &f) {
+    f.inicio = NULL;
+}
+
+template<typename TIPO>
+void entrarNaFila(Fila<TIPO> &f, TIPO dado) {  //ADICIONA NO FIM
+    auto novoItem = new ItemFila<TIPO>;
+    novoItem->dado = dado;
+    novoItem->prox = nullptr;
+    if (f.inicio == nullptr) {
+        f.inicio = novoItem;
+    } else {
+        ItemFila<TIPO> *aux = f.inicio;
+        while (aux->prox != nullptr) {
+            aux = aux->prox;
+        }
+        aux->prox = novoItem;
+    }
+}
+
+
+template<typename TIPO>
+TIPO atender(Fila<TIPO> &f) {   //REMOVE INICIO
+    if (f.inicio != nullptr) {
+        ItemFila<TIPO> *apagado = f.inicio;
+        TIPO dado = apagado->dado;
+        f.inicio = apagado->prox;
+
+        delete apagado;
+        return dado;
+    }
+}
+
+template<typename TIPO>
+TIPO primeiro(Fila<TIPO> &f) {
+    if (f.inicio != NULL) {
+        return f.inicio.dado;
+    }
+}
+
+#endif  // FILA_H
