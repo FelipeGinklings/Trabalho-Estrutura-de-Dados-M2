@@ -3,7 +3,6 @@
 
 using namespace std;
 
-const int MAX_IGNORE_CHARS = 10000; 
 
 void simular_atendimento_guiches(Guiche* guiches, int qtd_guiches) {
     if (qtd_guiches == 0) return;
@@ -103,20 +102,10 @@ int main() {
 
     for (int tempo_atual = 1; tempo_atual <= dados.qtd_tempo_total; tempo_atual++) {
         if(tempo_atual==1){
-            // Consome o \n deixado pelos cin >>
-            // Você pode usar cin.ignore(MAX_IGNORE_CHARS, '\n'); para mais robustez
-            // ou um simples cin.ignore() se só houver o \n.
-            // Se o seu cin.ignore() dentro do loop já estiver funcionando, talvez não precise deste.
-            // Teste para ver o que funciona melhor com sua forma de usar o Enter.
-             char ch; // Para consumir um caracter do buffer, esperando o enter
-             ch = cin.get(); // ou cin.ignore();
-             if (ch != '\n' && ch != EOF) { // Se não foi newline, e não fim do arquivo
-                 // Pode ser que algo mais estivesse no buffer, limpar até o \n
-                 cin.ignore(MAX_IGNORE_CHARS, '\n');
-             }
+            cin.ignore();
         }
         cout << "\n\n--- Tempo: " << tempo_atual << " --- (Pressione ENTER para continuar)";
-         cin.ignore();
+        cin.ignore();
 
 
         if (dados.carga_por_turno > 0) {
@@ -131,8 +120,8 @@ int main() {
         
         int total_direcionados_geral = dados.total_socios_procuraram + dados.total_normais_procuraram;
         if (total_direcionados_geral > 0) {
-            double perc_socios_direcionados = (double)dados.total_socios_procuraram / total_direcionados_geral * 100.0;
-            double perc_normais_direcionados = (double)dados.total_normais_procuraram / total_direcionados_geral * 100.0;
+            double perc_socios_direcionados = (double)dados.total_socios_procuraram / total_direcionados_geral * 100;
+            double perc_normais_direcionados = (double)dados.total_normais_procuraram / total_direcionados_geral * 100;
             
             cout << "Proporcao de Torcedores Direcionados (Acumulada): Socios " << perc_socios_direcionados << "% (" << dados.total_socios_procuraram << "), "
             << "Normais " << perc_normais_direcionados << "% (" << dados.total_normais_procuraram << ")\n";
@@ -147,7 +136,7 @@ int main() {
             for (int i = 0; i < dados.qtd_guiche_socio; i++) {
                 if (!filaVazia(guichesSocios[i].fila)) guiches_ocupados_socios++;
             }
-            int perc_ocup_socios = guiches_ocupados_socios / dados.qtd_guiche_socio * 100.0;
+            int perc_ocup_socios = guiches_ocupados_socios / dados.qtd_guiche_socio * 100;
             cout << "Ocupacao Guiches Socios: " << perc_ocup_socios << "% (" 
                  << guiches_ocupados_socios << "/" << dados.qtd_guiche_socio << ")\n";
         }
@@ -157,7 +146,7 @@ int main() {
             for (int i = 0; i < dados.qtd_guiche_normal; i++) {
                 if (!filaVazia(guichesNormais[i].fila)) guiches_ocupados_normais++;
             }
-            int perc_ocup_normais = guiches_ocupados_normais / dados.qtd_guiche_normal * 100.0;
+            int perc_ocup_normais = guiches_ocupados_normais / dados.qtd_guiche_normal * 100;
             cout << "Ocupacao Guiches Normais: " << perc_ocup_normais << "% ("<< guiches_ocupados_normais << "/" << dados.qtd_guiche_normal << ")\n";
         }
 
