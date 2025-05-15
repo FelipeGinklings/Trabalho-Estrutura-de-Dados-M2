@@ -18,7 +18,7 @@ void simular_atendimento_guiches(Guiche* guiches, int qtd_guiches) {
     }
 }
 
-void exibir_estado_filas(Guiche* guiches, int qtd_guiches, const char* tipo_guiche_label) {
+void exibir_estado_filas(Guiche* guiches, int qtd_guiches, string tipo_guiche_label) {
     cout << "\n--- Filas " << tipo_guiche_label << " --- \n";
     if (qtd_guiches == 0) {
         cout << "Nenhum guiche deste tipo.\n";
@@ -36,9 +36,9 @@ void exibir_estado_filas(Guiche* guiches, int qtd_guiches, const char* tipo_guic
 }
 
 // Função auxiliar para calcular e imprimir porcentagem
-void imprimir_porcentagem(long long parte, long long total, const char* label) {
+void imprimir_porcentagem(float parte, float total, string label) {
     if (total > 0) {
-        double perc = (double)parte / total * 100.0;
+        float perc = parte / total * 100;
         cout << label << parte << " (" << perc << "%)";
     } else {
         cout << label << parte << " (N/A)";
@@ -57,7 +57,7 @@ int main() {
     dados.normais_atend_2_ut = 0;
     dados.normais_atend_3_ut = 0;
 
-
+    /*
     cout << "--- Configuracao da Simulacao ---\n";
     cout << "Quantidade de guiches socio-torcedor: ";
     cin >> dados.qtd_guiche_socio;
@@ -69,6 +69,13 @@ int main() {
     cin >> dados.carga_por_turno;
     cout << "Quantidade de tempo (unidades) para simular: ";
     cin >> dados.qtd_tempo_total;
+   */
+    
+    dados.qtd_guiche_socio=2;
+    dados.qtd_guiche_normal=8;
+    dados.carga_inicial=100;
+    dados.carga_por_turno=1;
+    dados.qtd_tempo_total=10;
 
     Guiche* guichesSocios = nullptr;
     if (dados.qtd_guiche_socio > 0) {
@@ -109,12 +116,7 @@ int main() {
              }
         }
         cout << "\n\n--- Tempo: " << tempo_atual << " --- (Pressione ENTER para continuar)";
-         char ch_loop; // Para consumir o Enter do loop
-         ch_loop = cin.get(); // ou cin.ignore();
-         if (ch_loop != '\n' && ch_loop != EOF && ch_loop != '\r') { // Adicionado \r para Windows
-             // Algo além do enter foi digitado, limpar o resto
-             cin.ignore(MAX_IGNORE_CHARS, '\n');
-         }
+         cin.ignore();
 
 
         if (dados.carga_por_turno > 0) {
@@ -133,7 +135,7 @@ int main() {
             double perc_normais_direcionados = (double)dados.total_normais_procuraram / total_direcionados_geral * 100.0;
             
             cout << "Proporcao de Torcedores Direcionados (Acumulada): Socios " << perc_socios_direcionados << "% (" << dados.total_socios_procuraram << "), "
-                 << "Normais " << perc_normais_direcionados << "% (" << dados.total_normais_procuraram << ")\n";
+            << "Normais " << perc_normais_direcionados << "% (" << dados.total_normais_procuraram << ")\n";
         } else {
             cout << "Nenhum torcedor direcionado aos guiches ate o momento.\n";
         }
@@ -145,7 +147,7 @@ int main() {
             for (int i = 0; i < dados.qtd_guiche_socio; i++) {
                 if (!filaVazia(guichesSocios[i].fila)) guiches_ocupados_socios++;
             }
-            double perc_ocup_socios = (double)guiches_ocupados_socios / dados.qtd_guiche_socio * 100.0;
+            int perc_ocup_socios = guiches_ocupados_socios / dados.qtd_guiche_socio * 100.0;
             cout << "Ocupacao Guiches Socios: " << perc_ocup_socios << "% (" 
                  << guiches_ocupados_socios << "/" << dados.qtd_guiche_socio << ")\n";
         }
@@ -155,15 +157,14 @@ int main() {
             for (int i = 0; i < dados.qtd_guiche_normal; i++) {
                 if (!filaVazia(guichesNormais[i].fila)) guiches_ocupados_normais++;
             }
-            double perc_ocup_normais = (double)guiches_ocupados_normais / dados.qtd_guiche_normal * 100.0;
-            cout << "Ocupacao Guiches Normais: " << perc_ocup_normais << "% ("
-                 << guiches_ocupados_normais << "/" << dados.qtd_guiche_normal << ")\n";
+            int perc_ocup_normais = guiches_ocupados_normais / dados.qtd_guiche_normal * 100.0;
+            cout << "Ocupacao Guiches Normais: " << perc_ocup_normais << "% ("<< guiches_ocupados_normais << "/" << dados.qtd_guiche_normal << ")\n";
         }
 
         // Exibir distribuição de tempo de atendimento A CADA TURNO (opcional, pode poluir)
         // Se preferir, mova para o final da simulação
         cout << "Distribuicao de Tempo de Atendimento (Acumulado):\n";
-        long long total_socios_com_tempo_definido = dados.socios_atend_1_ut + dados.socios_atend_2_ut;
+        float total_socios_com_tempo_definido = dados.socios_atend_1_ut + dados.socios_atend_2_ut;
         if (total_socios_com_tempo_definido > 0) {
             cout << "  Socios:\n";
             imprimir_porcentagem(dados.socios_atend_1_ut, total_socios_com_tempo_definido, "    - 1 UT: ");
@@ -171,7 +172,7 @@ int main() {
             imprimir_porcentagem(dados.socios_atend_2_ut, total_socios_com_tempo_definido, "2 UT: ");
             cout << "\n";
         }
-        long long total_normais_com_tempo_definido = dados.normais_atend_1_ut + dados.normais_atend_2_ut + dados.normais_atend_3_ut;
+        float total_normais_com_tempo_definido = dados.normais_atend_1_ut + dados.normais_atend_2_ut + dados.normais_atend_3_ut;
         if (total_normais_com_tempo_definido > 0) {
             cout << "  Normais:\n";
             imprimir_porcentagem(dados.normais_atend_1_ut, total_normais_com_tempo_definido, "    - 1 UT: ");
@@ -190,7 +191,7 @@ int main() {
     
     // Exibir Resumo Final da Distribuição de Tempos de Atendimento
     cout << "\nResumo Final da Distribuicao de Tempo de Atendimento (Total de Torcedores com Tempo Definido):\n";
-    long long final_total_socios_com_tempo = dados.socios_atend_1_ut + dados.socios_atend_2_ut;
+    float final_total_socios_com_tempo = dados.socios_atend_1_ut + dados.socios_atend_2_ut;
     if (final_total_socios_com_tempo > 0) {
         cout << "  Socios (Total: " << final_total_socios_com_tempo << "):\n";
         imprimir_porcentagem(dados.socios_atend_1_ut, final_total_socios_com_tempo, "    - 1 UT: ");
@@ -201,7 +202,7 @@ int main() {
         cout << "  Nenhum socio com tempo de atendimento definido.\n";
     }
 
-    long long final_total_normais_com_tempo = dados.normais_atend_1_ut + dados.normais_atend_2_ut + dados.normais_atend_3_ut;
+    float final_total_normais_com_tempo = dados.normais_atend_1_ut + dados.normais_atend_2_ut + dados.normais_atend_3_ut;
     if (final_total_normais_com_tempo > 0) {
         cout << "  Normais (Total: " << final_total_normais_com_tempo << "):\n";
         imprimir_porcentagem(dados.normais_atend_1_ut, final_total_normais_com_tempo, "    - 1 UT: ");
@@ -215,7 +216,7 @@ int main() {
     }
     
 
-    long long total_torcedores_restantes_nas_filas = 0; 
+    float total_torcedores_restantes_nas_filas = 0; 
     int total_guiches_ativos = 0;
 
     if (guichesSocios) { 
@@ -234,22 +235,22 @@ int main() {
     cout << "\nTorcedores restantes nas filas: " << total_torcedores_restantes_nas_filas << endl;
 
     if (total_guiches_ativos > 0) {
-        float media_torcedores_por_fila = (float)total_torcedores_restantes_nas_filas / total_guiches_ativos;
+        float media_torcedores_por_fila = total_torcedores_restantes_nas_filas / total_guiches_ativos;
         cout << "Media de torcedores por fila ao final: " << media_torcedores_por_fila << endl;
     } else {
         cout << "Nenhum guiche esteve ativo para calcular media.\n";
     }
 
-    if (guichesSocios) delete[] guichesSocios;
-    if (guichesNormais) delete[] guichesNormais;
+    if (guichesSocios){
+        delete[] guichesSocios;
+    }
+    if (guichesNormais){
+        delete[] guichesNormais;
+    }
 
     cout << "\nSimulacao concluida. Pressione ENTER para sair.";
     // Limpeza final do buffer antes de sair
-    char ch_final;
-    ch_final = cin.get();
-    if (ch_final != '\n' && ch_final != EOF && ch_final != '\r') {
-         cin.ignore(MAX_IGNORE_CHARS, '\n');
-    }
+    cin.ignore();
     // Se quiser uma pausa final absoluta:
     // cin.get(); 
 
