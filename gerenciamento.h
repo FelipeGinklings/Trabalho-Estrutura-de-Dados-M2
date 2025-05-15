@@ -14,11 +14,11 @@ struct DadosSimulacao {
     int total_normais_procuraram; 
 
     // NOVOS CONTADORES PARA TEMPO DE ATENDIMENTO
-    long long socios_atend_1_ut;
-    long long socios_atend_2_ut;
-    long long normais_atend_1_ut;
-    long long normais_atend_2_ut;
-    long long normais_atend_3_ut;
+    float socios_atend_1_ut;
+    float socios_atend_2_ut;
+    float normais_atend_1_ut;
+    float normais_atend_2_ut;
+    float normais_atend_3_ut;
 };
 
 // Estrutura para representar um torcedor
@@ -177,9 +177,7 @@ void dividir_tempo_normal(int total_novos_normais, Guiche* guiches_normais, Dado
 
 
 // Distribui a nova carga de torcedores com base na disponibilidade de guichês.
-void distribuir_carga_turno(int carga_do_turno, 
-                            Guiche* guiches_socios, Guiche* guiches_normais,
-                            DadosSimulacao &dados_sim) {
+void distribuir_carga_turno(int carga_do_turno, Guiche* guiches_socios, Guiche* guiches_normais,DadosSimulacao &dados_sim) {
     if (carga_do_turno <= 0) {
         return;
     }
