@@ -37,8 +37,8 @@ void inicializa_Guiche(Guiche &g) {
 }
 
 int arredondar(float x) {
-    int inteiro = (int)x;
-    if ((x - (float)inteiro) >= 0.5f) {
+    float inteiro = x;
+    if ((x - inteiro) >= 0.5) {
         return inteiro + 1;
     }
     return inteiro;
@@ -128,7 +128,7 @@ void adicionar_torcedor_normal(int q_ut1, int q_ut2, int q_ut3, Guiche* guiches,
 void dividir_tempo_socios(int total_novos_socios, Guiche* guiches_socios, DadosSimulacao &dados_sim) {
     if (dados_sim.qtd_guiche_socio == 0 || total_novos_socios == 0) return;
 
-    int socios_1_ut = arredondar(total_novos_socios * 0.85f);
+    int socios_1_ut = arredondar(total_novos_socios * 0.85);
     int socios_2_ut = total_novos_socios - socios_1_ut; 
     if (socios_2_ut < 0) socios_2_ut = 0; 
     
@@ -143,16 +143,16 @@ void dividir_tempo_socios(int total_novos_socios, Guiche* guiches_socios, DadosS
 void dividir_tempo_normal(int total_novos_normais, Guiche* guiches_normais, DadosSimulacao &dados_sim) {
     if (dados_sim.qtd_guiche_normal == 0 || total_novos_normais == 0) return;
 
-    int normais_3_ut = arredondar(total_novos_normais * 0.45f);
-    int normais_2_ut = arredondar(total_novos_normais * 0.30f);
+    int normais_3_ut = arredondar(total_novos_normais * 0.45);
+    int normais_2_ut = arredondar(total_novos_normais * 0.30);
     int normais_1_ut = total_novos_normais - (normais_2_ut + normais_3_ut);
 
     if (normais_1_ut < 0) { // Bloco de ajuste copiado da versão anterior
         normais_1_ut = 0;
         int soma_parcial = normais_2_ut + normais_3_ut;
         if (soma_parcial > total_novos_normais) {
-            normais_1_ut = arredondar(total_novos_normais * 0.25f);
-            normais_2_ut = arredondar(total_novos_normais * 0.30f);
+            normais_1_ut = arredondar(total_novos_normais * 0.25);
+            normais_2_ut = arredondar(total_novos_normais * 0.30);
             normais_3_ut = total_novos_normais - normais_1_ut - normais_2_ut;
             if (normais_3_ut < 0) { 
                 normais_3_ut = 0;
@@ -197,7 +197,7 @@ void distribuir_carga_turno(int carga_do_turno, Guiche* guiches_socios, Guiche* 
     }
     // CASO 3: Sem nenhum tipo de guichê
     else if (dados_sim.qtd_guiche_socio == 0 && dados_sim.qtd_guiche_normal == 0) {
-        int ideal_socios_neste_turno = arredondar(carga_do_turno * 0.05f);
+        int ideal_socios_neste_turno = arredondar(carga_do_turno * 0.05);
         int ideal_normais_neste_turno = carga_do_turno - ideal_socios_neste_turno;
         
         dados_sim.total_socios_procuraram += ideal_socios_neste_turno;
@@ -213,7 +213,7 @@ void distribuir_carga_turno(int carga_do_turno, Guiche* guiches_socios, Guiche* 
         int total_acumulado_antes_do_turno = dados_sim.total_socios_procuraram + dados_sim.total_normais_procuraram;
         int total_geral_considerando_nova_carga = total_acumulado_antes_do_turno + carga_do_turno;
 
-        int meta_socios_acumulados = arredondar(total_geral_considerando_nova_carga * 0.05f);
+        int meta_socios_acumulados = arredondar(total_geral_considerando_nova_carga * 0.05);
         socios_para_adicionar_neste_turno = meta_socios_acumulados - dados_sim.total_socios_procuraram;
 
         if (socios_para_adicionar_neste_turno < 0) {
