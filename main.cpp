@@ -78,7 +78,7 @@ int main() {
     dados.carga_por_turno=1;
     dados.qtd_tempo_total=10;
 */
-    Guiche* guichesSocios = nullptr;
+    */ Guiche* guichesSocios = nullptr;
     if (dados.qtd_guiche_socio > 0) {
         guichesSocios =
             new Guiche[dados.qtd_guiche_socio];  // cria um vetor com o tamanho
